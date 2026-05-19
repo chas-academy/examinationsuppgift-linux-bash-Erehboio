@@ -11,9 +11,7 @@ do
 
     home="/home/$user"
 
-    mkdir -p "$home/Documents"
-    mkdir -p "$home/Downloads"
-    mkdir -p "$home/Work"
+    mkdir -p $home/{Documents,Downloads,Work}
 
     chown -R "$user:$user" "$home"
 
