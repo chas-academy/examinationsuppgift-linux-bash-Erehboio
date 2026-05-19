@@ -1,33 +1,41 @@
 #!/bin/bash
 
+#kontrollera att skriptet körs i root
+
 if [ "$EUID" -ne 0 ]; then
-    echo "You need to be root"
+    echo "Du måste vara root för att köra detta script."
     exit 1
 fi
 
+#loopa igenom användare som skickades in
 for user in "$@"
 do
+    # Skapa användare med hemkatalog
     useradd -m "$user"
 
-    home="/home/$user"
+    # ======================================
+    # Skapa katalogstruktur för användaren
+    # ======================================
+        mkdir /home/"$user"/Documents
+        mkdir /home/"$user"/Downloads
+        mkdir /home/"$user"/Work
 
-    mkdir -p $home/{Documents,Downloads,Work}
+    # Sätt ägare till användaren
+        chown "$user":"$user" /home/"$user"/Documents
+        chown "$user":"$user" /home/"$user"/Downloads
+        chown "$user":"$user" /home/"$user"/Work
 
-    chown -R "$user:$user" "$home"
+    # Sätt rättigheter (endast ägare har access)
+        chmod 700 /home/"$user"/Documents
+        chmod 700 /home/"$user"/Downloads
+        chmod 700 /home/"$user"/Work
 
-    chmod 700 "$home"
-    chmod 700 "$home/Documents"
-    chmod 700 "$home/Downloads"
-    chmod 700 "$home/Work"
+    # ======================================
+    # Skapa welcome-fil
+    # ======================================
+        echo "Welcome $user" > /home/"$user"/welcome.txt
 
-    echo "Welcome $user" > "$home/welcome.txt"
-    echo "Other users in the system:" >> "$home/welcome.txt"
+    # Hämta alla systemanvändare
+    cut -d: -f1 /etc/passwd | grep -v "^$user$" >> /home/"$user"welcome.txt
 
-    for u in "$@"
-    do
-        if [ "$u" != "$user" ]; then
-            echo "$u" >> "$home/welcome.txt"
-        fi
     done
-
-done
