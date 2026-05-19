@@ -1,37 +1,41 @@
 #!/bin/bash
 
 # Kontrollerar att scriptet körs som root
-# Annars avbryts det direkt
 if [ "$EUID" -ne 0 ]; then
-      echo "Du behöver vara Root för att köra detta skript"
-      exit 1
+    echo "Du måste vara root för att köra detta script"
+    exit 1
 fi
 
-# Loopar igenom alla användarnamn som skickas som argument
+# Loopar igenom alla användare som skickas in som argument
 for user in "$@"
 do
-    # Skapar användaren och hemkatalog
+    # Skapar användaren (hoppar över om den redan finns)
+    if id "$user" 2>/dev/null; then
+        echo "Användaren $user finns redan"
+        continue
+    fi
+
     useradd -m "$user"
 
-    # Skapar undermappar i användarens hemkatalog
-    mkdir /home/"$user"/Documents
-    mkdir /home/"$user"/Downloads
-    mkdir /home/"$user"/Work
+    # Skapar mappar i hemkatalogen
+    mkdir -p "/home/$user/Documents"
+    mkdir -p "/home/$user/Downloads"
+    mkdir -p "/home/$user/Work"
 
-    # Sätter ägare på undermapparna så att endast användaren äger dem
-    chown "$user":"$user" /home/"$user"/Documents
-    chown "$user":"$user" /home/"$user"/Downloads
-    chown "$user":"$user" /home/"$user"/Work
+    # Sätter ägare på hela hemkatalogen
+    chown -R "$user:$user" "/home/$user"
 
-    # Sätter rättigheter så att endast ägaren har full åtkomst
-    chmod 700 /home/"$user"
-    chmod 700 /home/"$user"/Documents
-    chmod 700 /home/"$user"/Downloads
-    chmod 700 /home/"$user"/Work
+    # Endast ägaren ska ha åtkomst
+    chmod 700 "/home/$user"
+    chmod 700 "/home/$user/Documents"
+    chmod 700 "/home/$user/Downloads"
+    chmod 700 "/home/$user/Work"
 
-    # Skapar en välkomstfil i användarens hemkatalog
-    echo "Välkommen $user" > /home/"$user"/welcome.txt
+    # Skapar välkomstfil
+    echo "Välkommen $user" > "/home/$user/welcome.txt"
+    echo "Andra användare i systemet:" >> "/home/$user/welcome.txt"
 
-    # Lägger till lista över andra användare i systemet
-    cut -d: -f1 /etc/passwd | grep -v "^$user$" >> /home/"$user"/welcome.txt
+    # Lägger till alla andra användare (utom den nya)
+    cut -d: -f1 /etc/passwd | grep -v "^$user$" >> "/home/$user/welcome.txt"
+
 done
