@@ -10,22 +10,21 @@ fi
 for user in "$@"
 do
     # Skapar användaren (hoppar över om den redan finns)
-    if id "$user"; then
-        echo "Användaren $user finns redan"
+    if id "$user" 2>/dev/null; then
         continue
     fi
 
     useradd -m "$user"
 
-    # Skapar mappar i hemkatalogen
-    mkdir /home/"$user"/Documents
-    mkdir /home/"$user"/Downloads
-    mkdir /home/"$user"/Work
+    # Skapar katalogstruktur i hemkatalogen
+    mkdir -p /home/"$user"/Documents
+    mkdir -p /home/"$user"/Downloads
+    mkdir -p /home/"$user"/Work
 
-    # Sätter ägare på hemkatalogen (VIKTIGT: hela home, annars kan rättigheter faila)
-    chown -R "$user":"$user" /home/"$user"
+    # Sätter ägare på hemkatalogen och allt innehåll
+    chown -R "$user:$user" /home/"$user"
 
-    # Endast ägaren ska ha åtkomst
+    # Sätter rättigheter så endast ägaren har åtkomst
     chmod 700 /home/"$user"
     chmod 700 /home/"$user"/Documents
     chmod 700 /home/"$user"/Downloads
@@ -35,7 +34,7 @@ do
     echo "Välkommen $user" > /home/"$user"/welcome.txt
     echo "Andra användare i systemet:" >> /home/"$user"/welcome.txt
 
-    # Lägger till alla andra användare (utan systemkonton som kan störa testet)
+    # Lägger till andra användare i systemet (utan current user)
     getent passwd | cut -d: -f1 | grep -v "^$user$" >> /home/"$user"/welcome.txt
 
 done
