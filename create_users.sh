@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$EUID" -ne 0 ]; then
-    echo "Du måste vara root"
+    echo "You need to be root"
     exit 1
 fi
 
@@ -20,8 +20,8 @@ do
     chmod 700 "$home/Downloads"
     chmod 700 "$home/Work"
 
-    echo "Välkommen $user" > "$home/welcome.txt"
-    echo "Andra användare i systemet:" >> "$home/welcome.txt"
+    echo "Welcome $user" > "$home/welcome.txt"
+    echo "Other users in the system:" >> "$home/welcome.txt"
 
     for u in "$@"
     do
