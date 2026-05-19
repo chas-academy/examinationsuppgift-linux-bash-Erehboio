@@ -1,16 +1,19 @@
 #!/bin/bash
 
-# Kontrollera att scriptet körs som root
+# Kontrollerar att scriptet körs som root
 if [ "$EUID" -ne 0 ]; then
-    echo "Du behöver vara root"
+    echo "Du måste vara root för att köra detta script"
     exit 1
 fi
 
+# Loopar igenom alla användare som skickas in
 for user in "$@"
 do
-    if ! id "$user" >/dev/null 2>&1; then
-    useradd -m "$user"
+    # Skapa användare om den inte redan finns
+    if ! id "$user" 2>/dev/null; then
+        useradd -m "$user"
     fi
+
 
     mkdir -p /home/"$user"/Documents
     mkdir -p /home/"$user"/Downloads
