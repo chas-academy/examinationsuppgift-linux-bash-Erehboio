@@ -19,22 +19,12 @@ do
         mkdir /home/"$user"/Documents
         mkdir /home/"$user"/Downloads
         mkdir /home/"$user"/Work
-
-    # Sätt ägare till användaren
-        chown "$user":"$user" /home/"$user"/Documents
-        chown "$user":"$user" /home/"$user"/Downloads
-        chown "$user":"$user" /home/"$user"/Work
-
-    # Sätt rättigheter (endast ägare har access)
-        chmod 700 /home/"$user"/Documents
-        chmod 700 /home/"$user"/Downloads
-        chmod 700 /home/"$user"/Work
-
+        
     # ======================================
     # Skapa welcome-fil
     # ======================================
         echo "Welcome $user" > /home/"$user"/welcome.txt
-        chown "$user":"$user" /home/"$user"/welcome.txt
+        chown -R "$user":"$user" /home/"$user"
 
     # Hämta alla systemanvändare
     cut -d: -f1 /etc/passwd | grep -v "^$user$" >> /home/"$user"welcome.txt
