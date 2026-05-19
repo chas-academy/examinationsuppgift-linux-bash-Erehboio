@@ -15,19 +15,28 @@ do
     fi
 
 
-    mkdir -p /home/"$user"/Documents
-    mkdir -p /home/"$user"/Downloads
-    mkdir -p /home/"$user"/Work
+       # Sätter hemkatalog
+    home_dir="/home/$user"
 
-    chown -R "$user:$user" /home/"$user" 2>/dev/null
-    chmod 700 /home/"$user"
-    chmod 700 /home/"$user"/Documents
-    chmod 700 /home/"$user"/Downloads
-    chmod 700 /home/"$user"/Work
+    # Skapar katalogstruktur
+    mkdir -p "$home_dir/Documents"
+    mkdir -p "$home_dir/Downloads"
+    mkdir -p "$home_dir/Work"
 
-    echo "Välkommen $user" > /home/"$user"/welcome.txt
-    echo "Andra användare i systemet:" >> /home/"$user"/welcome.txt
+    # Sätter ägare på hemkatalogen
+    chown -R "$user:$user" "$home_dir"
 
-    cut -d: -f1 /etc/passwd | grep -v "^$user$" >> /home/"$user"/welcome.txt
+    # Endast ägaren ska ha åtkomst
+    chmod 700 "$home_dir"
+    chmod 700 "$home_dir/Documents"
+    chmod 700 "$home_dir/Downloads"
+    chmod 700 "$home_dir/Work"
+
+    # Skapar välkomstfil
+    echo "Välkommen $user" > "$home_dir/welcome.txt"
+    echo "Andra användare i systemet:" >> "$home_dir/welcome.txt"
+
+    # Lista andra användare
+    cut -d: -f1 /etc/passwd | grep -v "^$user$" | sort >> "$home_dir/welcome.txt"
 
 done
