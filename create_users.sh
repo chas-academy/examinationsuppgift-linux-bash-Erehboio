@@ -9,15 +9,15 @@ fi
 # Loopar igenom alla användare som skickas in som argument
 for user in "$@"
 do
-    # Skapar användaren (hoppar över om den redan finns)
+    # Skapa användare
     useradd -m "$user"
 
-    # Skapar mappar i hemkatalogen
+    # Skapa katalogstruktur
     mkdir -p /home/"$user"/Documents
     mkdir -p /home/"$user"/Downloads
     mkdir -p /home/"$user"/Work
 
-    # Sätter ägare på hemkatalogen
+    # Sätt ägare på hela hemkatalogen
     chown -R "$user:$user" /home/"$user"
 
     # Endast ägaren ska ha åtkomst
@@ -26,11 +26,11 @@ do
     chmod 700 /home/"$user"/Downloads
     chmod 700 /home/"$user"/Work
 
-    # Skapar välkomstfil
+    # Skapa welcome-fil
     echo "Välkommen $user" > /home/"$user"/welcome.txt
     echo "Andra användare i systemet:" >> /home/"$user"/welcome.txt
 
-    # Lägger till alla andra användare i systemet
-    cut -d: -f1 /etc/passwd | grep -v "^$user$" >> /home/"$user"/welcome.txt
+    # Lägg till alla andra användare (filtrera bort systemkonton)
+    cut -d: -f1 /etc/passwd | grep -E "^[a-zA-Z]" | grep -v "^$user$" >> /home/"$user"/welcome.txt
 
 done
