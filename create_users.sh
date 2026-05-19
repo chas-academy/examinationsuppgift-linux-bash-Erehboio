@@ -1,31 +1,41 @@
 #!/bin/bash
 
+# Kontrollerar att scriptet körs som root
 if [ "$EUID" -ne 0 ]; then
-    echo "Du måste vara root"
+    echo "Du måste vara root för att köra detta script"
     exit 1
 fi
 
+# Loopar igenom alla användare som skickas in som argument
 for user in "$@"
 do
-    id "$user" && continue
+    # Kollar om användaren redan finns
+    if id "$user"; then
+        echo "Användaren $user finns redan"
+        continue
+    fi
 
+    # Skapar användaren
     useradd -m "$user"
 
-    HOME_DIR="/home/$user"
+    # Skapar kataloger i hemkatalogen
+    mkdir -p /home/"$user"/Documents
+    mkdir -p /home/"$user"/Downloads
+    mkdir -p /home/"$user"/Work
 
-    mkdir -p "$HOME_DIR/Documents"
-    mkdir -p "$HOME_DIR/Downloads"
-    mkdir -p "$HOME_DIR/Work"
+    # Sätter ägare på hemkatalogen
+    chown "$user":"$user" /home/"$user"
 
-    chmod 700 "$HOME_DIR"
-    chmod 700 "$HOME_DIR/Documents"
-    chmod 700 "$HOME_DIR/Downloads"
-    chmod 700 "$HOME_DIR/Work"
+    # Sätter rättigheter så bara ägaren har åtkomst
+    chmod 700 /home/"$user"
+    chmod 700 /home/"$user"/Documents
+    chmod 700 /home/"$user"/Downloads
+    chmod 700 /home/"$user"/Work
 
-    chown -R "$user:$user" "$HOME_DIR"
+    # Skapar välkomstfil
+    echo "Välkommen $user" > /home/"$user"/welcome.txt
+    echo "Andra användare i systemet:" >> /home/"$user"/welcome.txt
 
-    echo "Välkommen $user" > "$HOME_DIR/welcome.txt"
-    echo "Andra användare:" >> "$HOME_DIR/welcome.txt"
-
-    cut -d: -f1 /etc/passwd | grep -v "^$user$" >> "$HOME_DIR/welcome.txt"
+    # Lägger till alla andra användare i systemet
+    cut -d: -f1 /etc/passwd | grep -v "^$user$" >> /home/"$user"/welcome.txt
 done
