@@ -1,7 +1,8 @@
 #!/bin/bash
 
+# Kontrollera att scriptet körs som root
 if [ "$EUID" -ne 0 ]; then
-    echo "Du behöver vara root för att köra detta script"
+    echo "Du behöver vara root"
     exit 1
 fi
 
