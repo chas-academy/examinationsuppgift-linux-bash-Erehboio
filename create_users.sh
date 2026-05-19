@@ -1,16 +1,16 @@
 #!/bin/bash
 
-# Kontrollerar att scriptet körs som root
+# Kontrollerar att scriptet körs som root.
 if [ "$EUID" -ne 0 ]; then
     echo "Du måste vara root för att köra detta script"
     exit 1
 fi
 
-# Loopar igenom alla användare som skickas in som argument
+# Loopar igenom alla användare som skickas in som argument.
 for user in "$@"
 do
-    # Skapar användaren (hoppar över om den redan finns)
-    if id "$user" 2>/dev/null; then
+    # Check om användaren redan finns.
+    if id "$user"; then
         echo "Användaren $user finns redan"
         continue
     fi
@@ -22,10 +22,10 @@ do
     mkdir -p "/home/$user/Downloads"
     mkdir -p "/home/$user/Work"
 
-    # Sätter ägare på hela hemkatalogen
+    # Sätter rätt ägare för hela deras hemkatalog.
     chown -R "$user:$user" "/home/$user"
 
-    # Endast ägaren ska ha åtkomst
+    # Ser till att endast ägaren har åtkomst.
     chmod 700 "/home/$user"
     chmod 700 "/home/$user/Documents"
     chmod 700 "/home/$user/Downloads"
@@ -35,7 +35,7 @@ do
     echo "Välkommen $user" > "/home/$user/welcome.txt"
     echo "Andra användare i systemet:" >> "/home/$user/welcome.txt"
 
-    # Lägger till alla andra användare (utom den nya)
+    # Lägger till alla andra användare utan den användaren som skapades själv.
     cut -d: -f1 /etc/passwd | grep -v "^$user$" >> "/home/$user/welcome.txt"
 
 done
