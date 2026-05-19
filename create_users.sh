@@ -8,7 +8,8 @@ fi
 
 for user in "$@"
 do
-    useradd -m "$user" 2>/dev/null
+    useradd -m "$user"
+done
 
     HOME_DIR=$(eval echo "~$user")
 
