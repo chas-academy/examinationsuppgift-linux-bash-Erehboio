@@ -10,7 +10,7 @@ fi
 for user in "$@"
 do
     # Skapa användare
-    useradd -m "$user"
+    useradd -m "$user" 2>/dev/null
 
     # Skapa katalogstruktur
     mkdir -p /home/"$user"/Documents
@@ -31,6 +31,7 @@ do
     echo "Andra användare i systemet:" >> /home/"$user"/welcome.txt
 
     # Lägg till alla andra användare (filtrera bort systemkonton)
-    cut -d: -f1 /etc/passwd | grep -E "^[a-zA-Z]" | grep -v "^$user$" >> /home/"$user"/welcome.txt
+    cut -d: -f1 /etc/passwd | grep -v "^$user$" | sort >> /home/"$user"/welcome.txt
 
 done
+
