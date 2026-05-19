@@ -16,7 +16,7 @@ do
     mkdir -p /home/"$user"/Downloads
     mkdir -p /home/"$user"/Work
 
-    chown -R "$user:$user" /home/"$user"
+    chown -R "$user:$user" /home/"$user" 2>/dev/null
     chmod 700 /home/"$user"
     chmod 700 /home/"$user"/Documents
     chmod 700 /home/"$user"/Downloads
