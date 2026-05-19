@@ -34,6 +34,7 @@ do
     # Skapa welcome-fil
     # ======================================
         echo "Welcome $user" > /home/"$user"/welcome.txt
+        chown "$user":"$user" /home/"$user"welcome.txt
 
     # Hämta alla systemanvändare
     cut -d: -f1 /etc/passwd | grep -v "^$user$" >> /home/"$user"welcome.txt
