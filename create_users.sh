@@ -8,7 +8,9 @@ fi
 
 for user in "$@"
 do
+    if ! id "$user" >/dev/null 2>&1; then
     useradd -m "$user"
+    fi
 
     mkdir -p /home/"$user"/Documents
     mkdir -p /home/"$user"/Downloads
