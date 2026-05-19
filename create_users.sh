@@ -6,36 +6,29 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-# Loopar igenom alla användare som skickas in som argument
 for user in "$@"
 do
-    # Skapar användaren (hoppar över om den redan finns)
-    if id "$user" 2>/dev/null; then
+    # Enkel check om användaren redan finns
+    if id "$user"; then
         echo "Användaren $user finns redan"
         continue
     fi
 
     useradd -m "$user"
 
-    # Skapar mappar i hemkatalogen
-    mkdir "/home/$user/Documents"
-    mkdir "/home/$user/Downloads"
-    mkdir "/home/$user/Work"
+    mkdir -p /home/"$user"/Documents
+    mkdir -p /home/"$user"/Downloads
+    mkdir -p /home/"$user"/Work
 
-    # Sätter ägare på hemkatalogen och mapparna
-    chown -R "$user:$user" "/home/$user"
+    chown "$user":"$user" /home/"$user"
 
-    # Endast ägaren ska ha åtkomst
-    chmod 700 "/home/$user"
-    chmod 700 "/home/$user/Documents"
-    chmod 700 "/home/$user/Downloads"
-    chmod 700 "/home/$user/Work"
+    chmod 700 /home/"$user"
+    chmod 700 /home/"$user"/Documents
+    chmod 700 /home/"$user"/Downloads
+    chmod 700 /home/"$user"/Work
 
-    # Skapar välkomstfil
-    echo "Välkommen $user" > "/home/$user/welcome.txt"
-    echo "Andra användare i systemet:" >> "/home/$user/welcome.txt"
+    echo "Välkommen $user" > /home/"$user"/welcome.txt
+    echo "Andra användare i systemet:" >> /home/"$user"/welcome.txt
 
-    # Lägger till alla andra användare
-    cut -d: -f1 /etc/passwd | grep -v "^$user$" >> "/home/$user/welcome.txt"
-
+    cut -d: -f1 /etc/passwd | grep -v "^$user$" >> /home/"$user"/welcome.txt
 done
